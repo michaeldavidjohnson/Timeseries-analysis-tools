@@ -576,4 +576,24 @@ def white_noise_checker(data):
     ljung_box[key] = acorr_ljungbox(data[key])
   
   return ljung_box
+
+def turbulent_signal_checker(power,end=20):
+  """
+  Uses the first order linear regression within an interrogation range to estimate 
+  the roll-off in loglog scale. Apperently we should see something like -5/7
+  """
+  slopes = {}
+  for key in power.keys():
+    f = power[key][0]
+    idx = np.where(f<20)
+    ex = power[key][0][idx][1:]
+    ps =  power[key][1][idx][1:]
+    X = np.zeros((2,len(ex))).T + 1
+    X.T[1] = np.log(ex)
+    y = np.log(ps).T
+
+    beta = np.linalg.inv(X.T @ X) @ X.T @ y
+    slopes[key] = beta[1]
+  return slopes
+
   
