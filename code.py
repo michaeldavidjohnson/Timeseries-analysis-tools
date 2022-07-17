@@ -113,7 +113,7 @@ def filter_data(data: dict, order, cutoff, bandpass, sample_frequency,plot_respo
   
   return filtered_dict
 
-def power_spectrum(data, sample_rate):
+def power_spectrum(data, sample_rate,to_disp=False):
   power_dict = {}
   for key in data.keys():
     input = data[key]
@@ -123,9 +123,13 @@ def power_spectrum(data, sample_rate):
     nyquist_frequency = sample_rate / 2
 
     freqs = nyquist_frequency * np.linspace(0,1,int(length/2)+1)
-    power_dict[key] = [freqs,2*np.abs(fft[0:int(length/2)+1])**2]
-  return power_dict
+    base_res = fft[0:int(length/2)+1]
+    if to_disp:
+      base_res = base_res / -(2*np.pi*freqs)**2 #Definition.
+    power_dict[key] = [freqs,2*np.abs(base_res)**2]
+    
 
+  return power_dict
 
 def set_sample_rate(sample_rate: int):
   return sample_rate
